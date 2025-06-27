@@ -1,41 +1,21 @@
-// src/models/Prescription.js
+// BE/src/models/Prescription.js
 const mongoose = require('mongoose');
 
 const PrescriptionSchema = new mongoose.Schema({
-    customPrescriptionId: { // Tương ứng với 'Id' trong sơ đồ
+    customPrescriptionId: { type: String, required: true, unique: true, trim: true },
+    patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Bệnh nhân (User PATIENT)
+    doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Bác sĩ (User DOCTOR)
+    receptionistId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Lễ tân đã tạo (User RECEPTIONIST)
+    pharmacistId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null }, // Nhân viên quầy thuốc đã phát (User PHARMACIST)
+    diagnosis: { type: String, default: 'Chờ chuẩn đoán', trim: true }, // Chuẩn đoán của bác sĩ
+    date: { type: Date, default: Date.now, required: true }, // Ngày khám/kê đơn
+    status: {
         type: String,
-        required: true,
-        unique: true,
-        trim: true
-    },
-    patientId: { // <-- THÊM TRƯỜNG 'patientId' (FK đến User)
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Đây là ID của User có role 'PATIENT'
+        enum: ['PENDING_EXAMINATION', 'PENDING_DISPENSE', 'COMPLETED', 'CANCELLED'],
+        default: 'PENDING_EXAMINATION',
         required: true
     },
-    doctorId: { // <-- THÊM TRƯỜNG 'doctorId' (FK đến User)
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Đây là ID của User có role 'DOCTOR'
-        required: true
-    },
-    diagnosis: { // <-- THÊM TRƯỜNG 'diagnosis' (String, tương ứng 'diagn...' VARCHAR)
-        type: String,
-        required: true,
-        trim: true
-    },
-    date: { // <-- THÊM TRƯỜNG 'date'
-        type: Date,
-        default: Date.now,
-        required: true
-    },
-    status: { // <-- THÊM TRƯỜNG 'status'
-        type: String, // INT trong sơ đồ, nhưng String enum tiện hơn cho trạng thái
-        enum: ['PENDING_DISPENSE', 'DISPENSED', 'CANCELLED'], // Ví dụ các trạng thái
-        default: 'PENDING_DISPENSE',
-        required: true
-    }
-}, {
-    timestamps: true // Giữ lại createdAt, updatedAt
-});
+    totalPrice: { type: Number, default: 0 } // Thêm vào để theo dõi doanh thu
+}, { timestamps: true });
 
 module.exports = mongoose.model('Prescription', PrescriptionSchema);

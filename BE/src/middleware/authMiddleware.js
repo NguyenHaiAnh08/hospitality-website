@@ -1,8 +1,9 @@
 // BE/src/middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../models/User'); // Import User model
 require('dotenv').config();
 
+// Middleware để bảo vệ các tuyến đường (route protection)
 exports.protect = async (req, res, next) => {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -15,7 +16,7 @@ exports.protect = async (req, res, next) => {
             }
             next();
         } catch (error) {
-            console.error('Token verification error:', error);
+            console.error('Token verification error:', error.message);
             if (error.name === 'TokenExpiredError') { return res.status(401).json({ message: 'Not authorized, token expired' }); }
             if (error.name === 'JsonWebTokenError') { return res.status(401).json({ message: 'Not authorized, token failed' }); }
             res.status(500).json({ message: 'Server error during token verification' });
@@ -26,6 +27,7 @@ exports.protect = async (req, res, next) => {
     }
 };
 
+// Middleware để phân quyền (authorization) dựa trên vai trò
 exports.authorizeRoles = (...roles) => {
     return (req, res, next) => {
         if (!req.user || !roles.includes(req.user.role)) {

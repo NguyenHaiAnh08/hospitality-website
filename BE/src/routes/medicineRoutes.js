@@ -1,24 +1,20 @@
 // BE/src/routes/medicineRoutes.js
 const express = require('express');
 const router = express.Router();
-const medicineController = require('../controllers/medicineController');
+const medicineController = require('../controllers/medicineController'); // Tên biến là 'medicineController'
 const { protect, authorizeRoles } = require('../middleware/authMiddleware');
 
-console.log('--- medicineRoutes.js loaded ---');
+// === CÁC API CRUD CHO MEDICINE ===
+router.post('/', protect, authorizeRoles('RECEPTIONIST', 'PHARMACIST'), medicineController.createMedicine); // <-- Sửa ở đây
+router.get('/', protect, authorizeRoles('RECEPTIONIST', 'PHARMACIST', 'DOCTOR'), medicineController.getAllMedicines); // <-- Sửa ở đây
+router.get('/:id', protect, authorizeRoles('RECEPTIONIST', 'PHARMACIST', 'DOCTOR'), medicineController.getMedicineById); // <-- Sửa ở đây
+router.put('/:id', protect, authorizeRoles('RECEPTIONIST', 'PHARMACIST'), medicineController.updateMedicine); // <-- Sửa ở đây
+router.delete('/:id', protect, authorizeRoles('RECEPTIONIST', 'PHARMACIST'), medicineController.deleteMedicine); // <-- Sửa ở đây
 
-// Tạo thuốc mới (ADMIN, PHARMACIST)
-router.post('/', protect, authorizeRoles('ADMIN', 'PHARMACIST'), medicineController.createMedicine);
-
-// Lấy tất cả thuốc (Mọi người đã đăng nhập có thể xem danh mục thuốc)
-router.get('/', protect, authorizeRoles('ADMIN', 'PHARMACIST', 'DOCTOR', 'PATIENT'), medicineController.getAllMedicines);
-
-// Lấy một thuốc theo _id (Mọi người đã đăng nhập có thể xem)
-router.get('/:id', protect, authorizeRoles('ADMIN', 'PHARMACIST', 'DOCTOR', 'PATIENT'), medicineController.getMedicineById);
-
-// Cập nhật thuốc (ADMIN, PHARMACIST)
-router.put('/:id', protect, authorizeRoles('ADMIN', 'PHARMACIST'), medicineController.updateMedicine);
-
-// Xóa thuốc (ADMIN, PHARMACIST)
-router.delete('/:id', protect, authorizeRoles('ADMIN', 'PHARMACIST'), medicineController.deleteMedicine);
+// === CÁC API THEO LUỒNG NGHIỆP VỤ ===
+router.get('/prescriptions/pending', protect, authorizeRoles('PHARMACIST'), medicineController.getPendingPrescriptions); // <-- Sửa ở đây
+router.post('/prescriptions/:id/dispense', protect, authorizeRoles('PHARMACIST'), medicineController.dispenseMedicine); // <-- Sửa ở đây
+router.get('/invoices/:prescriptionId', protect, authorizeRoles('RECEPTIONIST', 'PHARMACIST'), medicineController.getInvoiceDetails); // <-- Sửa ở đây
+router.get('/reports/revenue', protect, authorizeRoles('RECEPTIONIST'), medicineController.getRevenueStats); // <-- Sửa ở đây
 
 module.exports = router;
