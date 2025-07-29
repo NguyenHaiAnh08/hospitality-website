@@ -124,7 +124,7 @@ hospitality-website/
 ## Contact
 
 For questions or support, please contact:  
-**[Your Name]**  
-Email: [your.email@example.com]
+**[Hải Anh]**  
+Email: [haianh8102003@gmail.com]
 
 ---
